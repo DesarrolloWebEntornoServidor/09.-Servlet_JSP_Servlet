@@ -2,7 +2,6 @@ package paqueteServlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,29 +14,61 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/PasaAtributoAJSP")
 public class PasaAtributoAJSP extends HttpServlet {
+	private static final String ATRIBUTO_LISTA_PAISES = "listaPaises";
+	private static final String VISTA = "/recibeListaPaises.jsp";
 	private static final long serialVersionUID = 1L;
-	private Map<String,String> arrayPaises = new LinkedHashMap<String,String>() {{
-		put("ES", "España");
-		put("FR", "Francia");
-		put("IT", "Italia");
-		put("PT", "Portugal");		
+	private Map<String, String> arrayPaises;
 
-	}}; 
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	request.setAttribute("listaPaises", arrayPaises);
-    	String vista = "/recibeListaPaises.jsp";
-    	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(vista);
-        dispatcher.forward(request, response); 
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) {
+
+		iniciarPaises();
+
+		request.setAttribute(ATRIBUTO_LISTA_PAISES, arrayPaises);
+		String vista = VISTA;
+		RequestDispatcher dispatcher = getServletContext()
+				.getRequestDispatcher(vista);
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException e) {
+
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 	}
-	
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String siglaPais= request.getParameter("pais");
+	private void iniciarPaises() {
+		arrayPaises = new LinkedHashMap<String, String>() {
+
+			private static final long serialVersionUID = 1L;
+
+			{
+				put("ES", "España");
+				put("FR", "Francia");
+				put("IT", "Italia");
+				put("PT", "Portugal");
+
+			}
+		};
+
+	}
+
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
+		//TODO: Redirigir a una página con la información de que todo ha ido bien 
+		String siglaPais = request.getParameter("pais");
 		response.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		out.println("Se recibió la sigla de país: " + siglaPais + "<br />");
-		out.println("Correspondiente a : " + arrayPaises.get(siglaPais) + "<br />");
+
+		try (PrintWriter out = response.getWriter()) {
+			out.println("Se recibió la sigla de país: " + siglaPais + "<br />");
+			out.println("Correspondiente a : " + arrayPaises.get(siglaPais)
+					+ "<br />");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }
